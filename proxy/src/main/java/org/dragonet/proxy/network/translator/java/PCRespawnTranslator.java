@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.dragonet.proxy.network.session.ProxySession;
+import org.dragonet.proxy.network.session.cache.object.CachedPlayer;
 import org.dragonet.proxy.network.translator.PacketTranslator;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -33,27 +34,36 @@ public class PCRespawnTranslator implements PacketTranslator<ServerRespawnPacket
 
     @Override
     public void translate(ProxySession session, ServerRespawnPacket packet) {
-        if(packet.getDimension() != session.getCachedEntity().getDimension()) {
-            // TODO: finish this
-            ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
-            changeDimensionPacket.setDimension(packet.getDimension());
-            changeDimensionPacket.setPosition(session.getCachedEntity().getSpawnPosition());
-            changeDimensionPacket.setRespawn(true);
-            //session.sendPacket(changeDimensionPacket);
+        CachedPlayer cachedPlayer = session.getCachedEntity();
+        int dimension = 0;
 
-            PlayStatusPacket playStatusPacket = new PlayStatusPacket();
-            playStatusPacket.setStatus(PlayStatusPacket.Status.PLAYER_SPAWN);
-            //session.sendPacket(playStatusPacket);
-
-            session.getCachedEntity().setDimension(packet.getDimension());
-        } else {
-            RespawnPacket respawnPacket = new RespawnPacket();
-            respawnPacket.setPosition(session.getCachedEntity().getSpawnPosition());
-            session.sendPacket(respawnPacket);
+        switch(packet.getDimension()) {
+            case 0: dimension = 0; break;
+            case -1: dimension = 1; break;
+            case 1: dimension = 2; break;
+            default:
+                log.warn("Unknown dimension: " + packet.getDimension());
+                break;
         }
 
-        SetPlayerGameTypePacket setPlayerGameTypePacket = new SetPlayerGameTypePacket();
-        setPlayerGameTypePacket.setGamemode(packet.getGamemode().ordinal());
-        session.sendPacket(setPlayerGameTypePacket);
+        if (cachedPlayer.getDimension() == dimension) {
+            return;
+        }
+
+        cachedPlayer.setDimension(dimension);
+
+        ChangeDimensionPacket changeDimensionPacket = new ChangeDimensionPacket();
+        changeDimensionPacket.setDimension(dimension);
+        changeDimensionPacket.setRespawn(false);
+        changeDimensionPacket.setPosition(cachedPlayer.getPosition());
+        session.sendPacket(changeDimensionPacket);
+
+        SetPlayerGameTypePacket playerGameTypePacket = new SetPlayerGameTypePacket();
+        playerGameTypePacket.setGamemode(packet.getGamemode().ordinal());
+        session.sendPacket(playerGameTypePacket);
+
+        PlayStatusPacket playStatusPacket = new PlayStatusPacket();
+        playStatusPacket.setStatus(PlayStatusPacket.Status.PLAYER_SPAWN);
+        session.sendPacket(playStatusPacket);
     }
 }

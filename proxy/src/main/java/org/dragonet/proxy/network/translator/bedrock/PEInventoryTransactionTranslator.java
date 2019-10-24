@@ -40,7 +40,7 @@ public class PEInventoryTransactionTranslator implements PacketTranslator<Invent
     public void translate(ProxySession session, InventoryTransactionPacket packet) {
         CachedEntity cachedEntity = session.getEntityCache().getByProxyId(packet.getRuntimeEntityId());
         if(cachedEntity == null) {
-            //log.warn("InteractPacket: Cached entity is null");
+            //log.warn("InventoryTransactionPacket: Cached entity is null");
             return;
         }
         //log.warn(packet.getTransactionType().name() + " - " + packet.getActionType());
