@@ -22,8 +22,12 @@ import com.github.steveice10.mc.protocol.data.game.chunk.Chunk;
 import com.github.steveice10.mc.protocol.data.game.chunk.Column;
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.github.steveice10.mc.protocol.data.game.world.block.BlockState;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.math.vector.Vector2f;
 import com.nukkitx.math.vector.Vector3f;
+import com.nukkitx.nbt.NbtUtils;
+import com.nukkitx.nbt.stream.NBTOutputStream;
+import com.nukkitx.nbt.tag.Tag;
 import com.nukkitx.protocol.bedrock.data.ItemData;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +36,10 @@ import org.dragonet.proxy.data.chunk.ChunkData;
 import org.dragonet.proxy.data.chunk.ChunkSection;
 import org.dragonet.proxy.network.session.ProxySession;
 import org.dragonet.proxy.network.translator.types.BlockTranslator;
+import org.dragonet.proxy.util.TextFormat;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Log4j2
@@ -112,6 +117,17 @@ public class ChunkCache implements Cache {
                     }
                 }
             }
+
+            // Block entities
+            List<com.nukkitx.nbt.tag.CompoundTag> blockEntities = new ArrayList<>();
+            for (CompoundTag tag : Arrays.asList(column.getTileEntities())) {
+                //log.info("translating tile: " + TextFormat.AQUA + tag.get("id").getValue());
+
+                blockEntities.add(BlockTranslator.translateTileToBedrock(tag));
+            }
+
+            chunkData.setBlockEntities(blockEntities);
+
             return chunkData;
         }
         return null;

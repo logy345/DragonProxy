@@ -25,7 +25,7 @@ The project has been undergoing a rewrite for some time, and development has rec
 - [ ] Player movement
 - [ ] Inventory support
   - [x] Item NBT translation (name and lore, more to come soon)
-- [ ] Viewing entities
+- [x] Viewing entities
 - [x] Effects
 - [ ] Block breaking / placing
 - [x] Authentication (online mode)
@@ -51,12 +51,10 @@ Clone the repo recursively and then run `mvn clean install`. The output jar will
 ### Donating
 Donating helps support the project and its developers.  
   
-You can donate at [OpenCollective](https://opencollective.com/DragonetMC) or [Patreon](https://patreon.com/DragonetMC). The latter is easier for us, however, and will give you automatic Discord perks.
+You can donate at [OpenCollective](https://opencollective.com/DragonetMC) or [Patreon](https://patreon.com/DragonetMC).
 
 ### Libraries used
 * [NukkitX Protocol Library](https://github.com/NukkitX/Protocol)
 * [MCProtocolLib by Steveice10](https://github.com/Steveice10/MCProtocolLib)
 
 CircleCI: [![CircleCI](https://circleci.com/gh/DragonetMC/DragonProxy.svg?style=svg)](https://circleci.com/gh/DragonetMC/DragonProxy)
-
-###### *The REAL Better Together*

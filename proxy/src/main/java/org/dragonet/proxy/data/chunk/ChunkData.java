@@ -11,6 +11,9 @@
 package org.dragonet.proxy.data.chunk;
 
 import com.google.common.base.Preconditions;
+import com.nukkitx.nbt.NbtUtils;
+import com.nukkitx.nbt.stream.NBTOutputStream;
+import com.nukkitx.nbt.tag.CompoundTag;
 import com.nukkitx.network.VarInts;
 import com.nukkitx.protocol.bedrock.packet.LevelChunkPacket;
 import gnu.trove.TCollections;
@@ -18,6 +21,9 @@ import gnu.trove.map.TIntShortMap;
 import gnu.trove.map.hash.TIntShortHashMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.buffer.Unpooled;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import javax.annotation.Nonnull;
@@ -25,7 +31,9 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.ThreadSafe;
 import java.io.Closeable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Log4j2
 @ThreadSafe
@@ -55,6 +63,9 @@ public final class ChunkData implements Closeable {
 //    private final Set<Player> playerLoaders = new HashSet<>();
 //
 //    private final TIntObjectMap<BlockEntity> tiles = new TIntObjectHashMap<>();
+
+    @Setter
+    private List<com.nukkitx.nbt.tag.CompoundTag> blockEntities = new ArrayList<>();
 
     private final byte[] biomes;
 
@@ -356,32 +367,13 @@ public final class ChunkData implements Closeable {
 
             // Extra Data
             VarInts.writeUnsignedInt(buffer, 0);
-//            TIntShortMap extraData = this.extraData;
-//            VarInts.writeUnsignedInt(buffer, extraData.size());
-//            if (!extraData.isEmpty()) {
-//                extraData.forEachEntry((position, data) -> {
-//                    VarInts.writeInt(buffer, position);
-//                    buffer.writeShortLE(data);
-//                    return false;
-//                });
-//            }
 
-            // Block entities
-//            if (!this.tiles.isEmpty()) {
-//                try (ByteBufOutputStream stream = new ByteBufOutputStream(buffer)) {
-//                    this.tiles.forEachValue(blockEntity -> {
-//                        if (blockEntity instanceof BlockEntitySpawnable) {
-//                            try {
-//                                NBTIO.write(((BlockEntitySpawnable) blockEntity).getSpawnCompound(), stream,
-//                                        ByteOrder.LITTLE_ENDIAN, true);
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                        }
-//                        return false;
-//                    });
-//                }
-//            }
+            ByteBufOutputStream stream = new ByteBufOutputStream(Unpooled.buffer());
+            NBTOutputStream nbtStream = NbtUtils.createNetworkWriter(stream);
+            for (CompoundTag blockEntity : blockEntities) {
+                nbtStream.write(blockEntity);
+            }
+            buffer.writeBytes(stream.buffer());
 
             byte[] chunkData = new byte[buffer.readableBytes()];
             buffer.readBytes(chunkData);

@@ -21,6 +21,8 @@ package org.dragonet.proxy.network.translator.types;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
+import com.nukkitx.nbt.CompoundTagBuilder;
+import com.nukkitx.nbt.tag.CompoundTag;
 import com.nukkitx.protocol.bedrock.data.ItemData;
 import lombok.extern.log4j.Log4j2;
 import org.dragonet.proxy.DragonProxy;
@@ -90,6 +92,28 @@ public class BlockTranslator {
         }
 
         return ItemData.of(BEDROCK_BLOCKS.get("minecraft:bedrock").getRuntimeId(), (short) 0, item.getAmount());
+    }
+
+    public static CompoundTag translateTileToBedrock(com.github.steveice10.opennbt.tag.builtin.CompoundTag tag) {
+        CompoundTagBuilder builder = CompoundTagBuilder.builder();
+
+        // TODO: translate more things
+
+        switch(tag.get("id").getValue().toString()) {
+            case "Bed":
+                builder.stringTag("id", "Bed");
+                builder.byteTag("color", (byte) ((int) tag.get("color").getValue()));
+                break;
+            default:
+                builder.stringTag("id", tag.get("id").getValue().toString());
+                break;
+        }
+
+        builder.intTag("x", (int) tag.get("x").getValue());
+        builder.intTag("y", (int) tag.get("y").getValue());
+        builder.intTag("z", (int) tag.get("z").getValue());
+
+        return builder.buildRootTag();
     }
 
     private static String getBedrockIdentifier(String javaIdentifier) {
