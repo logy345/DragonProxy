@@ -7,7 +7,7 @@ locale: 'EN'
 
 # The IP and port the proxy will listen for connections on
 # '0.0.0.0' will bind to all IP addresses available on your device
-bind-address: '0.0.0.0'
+bind-address: '54.162.247.51'
 bind-port: 19132
 
 # The MOTD that will be shown on the MCPE server list
@@ -19,8 +19,8 @@ max-players: 1
 
 # The IP and port of the remote server to connect to
 # TODO: Add support for multiple servers
-remote-address: '127.0.0.1'
-remote-port: 25565
+remote-address: '188.165.34.132'
+remote-port: 25578
 
 # TODO
 #remote-servers:
