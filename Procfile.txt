@@ -1,1 +1,1 @@
-worker: bootstrap/target/DragonProxy.jar
+worker: java -jar bootstrap/target/DragonProxy.jar
